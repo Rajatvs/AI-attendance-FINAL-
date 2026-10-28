@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% set active='live' %}{% set title='Live Scan' %}
+{% block content %}
+<section class="page-head"><div><div class="eyebrow">LIVE ATTENDANCE</div><h1>Recognition workspace</h1><p>Detect → recognize → verify → record.</p></div><div class="camera-status"><i></i> Camera ready</div></section>
+<div class="live-layout">
+<div class="camera-panel"><video id="video" autoplay playsinline></video><canvas id="canvas" hidden></canvas><div class="scan-overlay"><div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div><span>LIVE</span></div><div class="camera-actions"><button class="primary" id="startBtn">Start camera</button><button class="ghost" id="challengeBtn">New liveness challenge</button></div></div>
+<div class="side-panel"><div class="challenge"><div class="eyebrow">LIVENESS CHALLENGE</div><h2 id="challengeText">Start a scan to begin</h2><div class="progress"><div id="progressBar"></div></div><p id="challengeHint">A fresh sequence helps reduce simple replay attacks.</p></div><div class="detections"><div class="panel-head"><h2>Detected</h2><span id="detCount">0</span></div><div id="detections"></div></div></div>
+</div>
+<script src="/static/js/live.js"></script>
+{% endblock %}

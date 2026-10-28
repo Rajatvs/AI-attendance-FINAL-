@@ -1,0 +1,14 @@
+{% extends "base.html" %}{% set active='dashboard' %}{% set title='Overview' %}
+{% block content %}
+<section class="hero"><div><div class="eyebrow">AUTOMATED AI ATTENDANCE</div><h1>Good evening, Admin.</h1><p>Monitor recognition, liveness verification and attendance from one workspace.</p></div><a class="primary" href="/live">Start live scan <span>→</span></a></section>
+<section class="stats">
+<div class="stat"><span>Registered students</span><strong>{{ stats.students }}</strong><small>Profiles in system</small></div>
+<div class="stat"><span>Present today</span><strong>{{ stats.present }}</strong><small class="up">● Live count</small></div>
+<div class="stat"><span>Absent today</span><strong>{{ stats.absent }}</strong><small>Based on roster</small></div>
+<div class="stat"><span>Attendance rate</span><strong>{{ stats.rate }}%</strong><small>Today</small></div>
+</section>
+<section class="grid-two">
+<div class="panel large"><div class="panel-head"><div><h2>Attendance intelligence</h2><p>Designed for fast classroom check-in.</p></div><span class="chip">LOCAL-FIRST</span></div><div class="pipeline"><div><b>01</b><span>Detect</span><small>Face localization</small></div><div><b>02</b><span>Recognize</span><small>LBPH identity match</small></div><div><b>03</b><span>Verify</span><small>Active liveness</small></div><div><b>04</b><span>Record</span><small>Duplicate-safe log</small></div></div></div>
+<div class="panel"><div class="panel-head"><div><h2>Security layer</h2><p>Replay-aware verification</p></div></div><div class="security"><div class="ring">✓</div><div><b>Challenge-based</b><p>Random live actions are requested before attendance is committed.</p></div></div></div>
+</section>
+{% endblock %}

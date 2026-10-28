@@ -1,0 +1,28 @@
+{% extends "base.html" %}{% set active='students' %}{% set title='Face Training' %}
+{% block content %}
+<section class="page-head"><div><div class="eyebrow">BIOMETRIC ENROLLMENT</div><h1>Register & train face</h1><p>Capture multiple angles so the LBPH model can learn the student's face.</p></div><a class="ghost" href="/students">← Students</a></section>
+<div class="train-grid">
+  <section class="training-camera panel">
+    <div class="training-head"><div><h2>Face capture</h2><p>Look straight, then slowly turn left, right, up and down.</p></div><span id="cameraState" class="chip">Camera idle</span></div>
+    <div class="video-wrap"><video id="trainVideo" autoplay muted playsinline></video><canvas id="trainCanvas" hidden></canvas><div id="box" class="face-guide"><span>Position your face inside the guide</span></div><div id="captureBadge" class="capture-badge">Waiting</div></div>
+    <div class="training-controls"><select id="studentSelect">{% for s in students %}<option value="{{ s.name }}">{{ s.name }} — {{ s.roll }}</option>{% endfor %}</select><button class="primary" id="startBtn">Start 15s training</button><button class="ghost" id="finishBtn" disabled>Finish & train LBPH</button></div>
+  </section>
+  <aside class="training-side">
+    <div class="panel progress-card"><div class="eyebrow">CAPTURE PROGRESS</div><div class="big-progress"><strong id="sampleCount">0</strong><span>/ 40 samples</span></div><div class="progress"><div id="progressBar"></div></div><p id="statusText">Select a student and start the camera. The system will collect one good face crop at a time.</p></div>
+    <div class="panel checklist"><h2>Training sequence</h2><div>✓ Front-facing samples</div><div>✓ Left / right angles</div><div>✓ Up / down angles</div><div>✓ Grayscale normalization</div><div>✓ LBPH model generation</div></div>
+    <div class="panel result-card" id="resultCard" hidden><div class="eyebrow">MODEL STATUS</div><h2 id="resultTitle">Training complete</h2><p id="resultText"></p><code>models/trainer.yml</code></div>
+  </aside>
+</div>
+<script>
+const video=document.getElementById('trainVideo'), canvas=document.getElementById('trainCanvas'), ctx=canvas.getContext('2d');
+const startBtn=document.getElementById('startBtn'), finishBtn=document.getElementById('finishBtn'), select=document.getElementById('studentSelect');
+const countEl=document.getElementById('sampleCount'), bar=document.getElementById('progressBar'), status=document.getElementById('statusText'), state=document.getElementById('cameraState'), badge=document.getElementById('captureBadge');
+let stream=null, running=false, captured=0, startedAt=0, timer=null;
+function setProgress(n){captured=n; countEl.textContent=n; bar.style.width=Math.min(100,n/40*100)+'%';}
+async function camera(){if(stream)return; stream=await navigator.mediaDevices.getUserMedia({video:{width:{ideal:1280},height:{ideal:720},facingMode:'user'},audio:false}); video.srcObject=stream; state.textContent='Camera ready';}
+async function sendFrame(){if(!running)return; canvas.width=video.videoWidth||640; canvas.height=video.videoHeight||480; ctx.drawImage(video,0,0,canvas.width,canvas.height); const image=canvas.toDataURL('image/jpeg',0.82); const r=await fetch('/api/training/frame',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image})}); const d=await r.json(); if(d.ok){if(d.captured){setProgress(d.count); badge.textContent='Face captured ✓'; badge.classList.add('good');}else{badge.textContent='Move into frame'; badge.classList.remove('good');}} }
+startBtn.onclick=async()=>{try{await camera(); const r=await fetch('/api/training/start',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:select.value})}); const d=await r.json(); if(!d.ok){status.textContent=d.message;return;} setProgress(0); running=true; startedAt=Date.now(); startBtn.disabled=true; finishBtn.disabled=true; status.textContent='Training active. Slowly move your head through different angles for 15 seconds.'; timer=setInterval(async()=>{if(Date.now()-startedAt>=15000){running=false;clearInterval(timer);finishBtn.disabled=captured<20;status.textContent=captured>=20?'Capture complete. Click “Finish & train LBPH”.':'Not enough good samples. Start again and keep your face visible.';return;} await sendFrame();},350);}catch(e){status.textContent='Camera access failed: '+e.message;}};
+finishBtn.onclick=async()=>{finishBtn.disabled=true; status.textContent='Training LBPH model...'; const r=await fetch('/api/training/finish',{method:'POST'}); const d=await r.json(); const card=document.getElementById('resultCard'); card.hidden=false; if(d.ok){document.getElementById('resultTitle').textContent='Training complete ✓';document.getElementById('resultText').textContent=`${d.samples} face samples were used for ${d.name}. The model has been saved and loaded by the recognition engine.`;status.textContent='Your face is now enrolled. You can test it from Live Scan.';}else{document.getElementById('resultTitle').textContent='Training failed';document.getElementById('resultText').textContent=d.message;finishBtn.disabled=false;}};
+window.addEventListener('beforeunload',()=>{if(stream)stream.getTracks().forEach(t=>t.stop());});
+</script>
+{% endblock %}

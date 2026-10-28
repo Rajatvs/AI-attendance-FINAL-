@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% set active='reports' %}{% set title='Reports' %}
+{% block content %}
+<section class="page-head"><div><div class="eyebrow">ATTENDANCE RECORDS</div><h1>Attendance history</h1><p>Recent recognition events and verification results.</p></div><a class="primary" href="/api/export">Export CSV</a></section>
+<div class="panel"><table><thead><tr><th>Date</th><th>Time</th><th>Student</th><th>Match</th><th>Liveness</th><th>Status</th></tr></thead><tbody>{% for r in rows %}<tr><td>{{r.date}}</td><td>{{r.time}}</td><td>{{r.name}}</td><td>{{r.confidence}}%</td><td>{{r.liveness}}</td><td><span class="status">{{r.status}}</span></td></tr>{% endfor %}</tbody></table></div>
+{% endblock %}

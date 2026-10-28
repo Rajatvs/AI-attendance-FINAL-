@@ -1,0 +1,8 @@
+{% extends "base.html" %}{% set active='students' %}{% set title='Students' %}
+{% block content %}
+<section class="page-head"><div><div class="eyebrow">ROSTER</div><h1>Student directory</h1><p>Manage the people eligible for attendance.</p></div><div style="display:flex;gap:10px"><a class="primary" href="/train">+ Register & train face</a><button class="ghost" onclick="addStudent()">+ Add student</button></div></section>
+<div class="panel"><table><thead><tr><th>Student</th><th>Roll</th><th>Email</th><th>Status</th></tr></thead><tbody>{% for s in students %}<tr><td><span class="table-avatar">{{ s.name[:2].upper() }}</span>{{ s.name }}</td><td>{{ s.roll }}</td><td>{{ s.email }}</td><td><a class="status" style="text-decoration:none" href="/train">Train face</a></td></tr>{% endfor %}</tbody></table></div>
+<script>
+async function addStudent(){const name=prompt("Student name"); if(!name)return; const r=await fetch('/api/students',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name})}); if(r.ok)location.reload();}
+</script>
+{% endblock %}

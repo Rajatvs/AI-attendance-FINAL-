@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AttendAI</title>
+<link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">A</div><div><b>AttendAI</b><span>Smart Attendance</span></div></div>
+    <nav>
+      <a href="/" class="{{ 'active' if active=='dashboard' else '' }}">◈ <span>Overview</span></a>
+      <a href="/live" class="{{ 'active' if active=='live' else '' }}">◉ <span>Live Scan</span></a>
+      <a href="/students" class="{{ 'active' if active=='students' else '' }}">◎ <span>Students</span></a>
+      <a href="/reports" class="{{ 'active' if active=='reports' else '' }}">▤ <span>Reports</span></a>
+    </nav>
+    <div class="sidebar-bottom"><div class="system"><i></i><span>Recognition engine online</span></div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="crumb">AI ATTENDANCE / {{ title }}</div><div class="profile"><span class="avatar">RV</span><span>Admin</span></div></header>
+    {% block content %}{% endblock %}
+  </main>
+</div>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
